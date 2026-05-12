@@ -1,12 +1,18 @@
-// app/page.tsx
+"use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 import { products, formatPrice } from "@/lib/products";
 
 export default function Home() {
   return (
     <main className="page">
+      {/* ambient glow */}
+      <div className="ambient ambient1" />
+      <div className="ambient ambient2" />
+
+      {/* NAV */}
       <nav className="nav">
         <div className="navInner">
           <div className="logo">NovaDrop</div>
@@ -19,21 +25,22 @@ export default function Home() {
         </div>
       </nav>
 
-      <section className="hero">
+      {/* HERO */}
+      <motion.section
+        className="hero"
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+      >
         <div className="heroInner">
           <div>
-            <span className="badge">
-              ✦ Free shipping over €20
-            </span>
+            <span className="badge">✦ Free shipping over €20</span>
 
-            <h1>
-              Premium tech essentials for modern setups.
-            </h1>
+            <h1>Premium tech essentials for modern setups.</h1>
 
             <p>
-              Minimal storefront powered by Next.js, Stripe,
-              and Vercel. Fast, responsive, and designed to
-              feel like a premium brand from day one.
+              Minimal, high-performance storefront built for speed and
+              clarity. Designed to feel like a real premium brand.
             </p>
 
             <div className="heroActions">
@@ -57,24 +64,28 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
+      {/* PRODUCTS */}
       <section className="section" id="products">
         <div className="sectionInner">
           <div className="sectionHeader">
             <div className="sectionTitle">
               <h2>Featured products</h2>
-
-              <p>
-                Curated accessories designed for clean desks
-                and productive spaces.
-              </p>
+              <p>Curated accessories for clean, productive setups.</p>
             </div>
           </div>
 
           <div className="grid">
-            {products.map((product) => (
-              <article className="card" key={product.id}>
+            {products.map((product, i) => (
+              <motion.article
+                className="card"
+                key={product.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.05 }}
+              >
                 <div className="cardImageWrap">
                   <img
                     src={product.images[0]}
@@ -86,7 +97,6 @@ export default function Home() {
                 <div className="cardBody">
                   <div className="cardTop">
                     <h3>{product.name}</h3>
-
                     <span className="tag">New</span>
                   </div>
 
@@ -97,20 +107,13 @@ export default function Home() {
                       {formatPrice(product.price)}
                     </span>
 
-                    <form
-                      action="/api/checkout"
-                      method="POST"
-                    >
+                    <form action="/api/checkout" method="POST">
                       <input
                         type="hidden"
                         name="productId"
                         value={product.id}
                       />
-
-                      <button
-                        className="buyBtn"
-                        type="submit"
-                      >
+                      <button className="buyBtn" type="submit">
                         Buy now
                       </button>
                     </form>
@@ -123,19 +126,17 @@ export default function Home() {
                     View product →
                   </Link>
                 </div>
-              </article>
+              </motion.article>
             ))}
           </div>
         </div>
       </section>
 
+      {/* FOOTER */}
       <footer className="footer" id="footer">
         <div className="footerInner">
           <span>© 2026 NovaDrop</span>
-
-          <span>
-            Built with Next.js + Stripe + Vercel
-          </span>
+          <span>Designed for modern workspaces.</span>
         </div>
       </footer>
     </main>
