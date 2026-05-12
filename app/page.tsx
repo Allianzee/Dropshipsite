@@ -1,4 +1,4 @@
-import { ShoppingBag, ShieldCheck, Truck } from "lucide-react";
+import Link from "next/link";
 import { products, formatPrice } from "@/lib/products";
 
 export default function Home() {
@@ -6,35 +6,51 @@ export default function Home() {
     <main className="page">
       <nav className="nav">
         <div className="logo">NovaDrop</div>
-        <div className="navLinks">
-          <a href="#products">Products</a>
-          <a href="#shipping">Shipping</a>
-          <a href="#faq">FAQ</a>
-        </div>
       </nav>
 
       <section className="hero">
         <div>
-          <span className="badge">New drop live • Free shipping over €50</span>
+          <span className="badge">Free shipping over €20</span>
+
           <h1>Clean products for clean setups.</h1>
+
           <p>
-            A modern dropshipping storefront template with product cards,
-            Stripe Checkout, trust sections, and Vercel-ready deployment.
+            Modern dropshipping storefront with product pages, Stripe payments,
+            and Vercel deployment.
           </p>
-
-          <div className="ctaRow">
-            <a className="btn btnPrimary" href="#products">Shop the drop</a>
-            <a className="btn btnGhost" href="#shipping">How it works</a>
-          </div>
-
-          <div className="notice">
-            Demo store. Replace products, policies, supplier details, and shipping times before selling for real.
-          </div>
         </div>
+      </section>
 
-        <div className="heroCard">
-          <div className="productMock" />
-          <div className="mockLabel">
+      <section className="section">
+        <div className="grid">
+          {products.map((product) => (
+            <div className="card" key={product.id}>
+              <img
+                src={product.images[0]}
+                className="productImage"
+              />
+
+              <h3>{product.name}</h3>
+              <p>{product.description}</p>
+
+              <div className="priceRow">
+                <span className="price">
+                  {formatPrice(product.price)}
+                </span>
+
+                <Link href={`/product/${product.id}`}>
+                  <button className="buyBtn">
+                    View
+                  </button>
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+}          <div className="mockLabel">
             <b>Featured Drop</b>
             <p style={{ margin: "8px 0 0", color: "#CBD5E1" }}>
               Setup gear, travel picks, and daily essentials.
