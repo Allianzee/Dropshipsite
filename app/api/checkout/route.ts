@@ -2,39 +2,75 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getProduct } from "@/lib/products";
 
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
 export async function POST(request: Request) {
   try {
-    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-
-    if (!stripeSecretKey) {
-      return NextResponse.json(
-        { error: "Missing STRIPE_SECRET_KEY environment variable." },
-        { status: 500 }
-      );
-    }
-
     const formData = await request.formData();
-    const productId = String(formData.get("productId") || "");
+
+    const productId = String(formData.get("productId"));
+
     const product = getProduct(productId);
 
     if (!product) {
-      return NextResponse.json(
-        { error: "Product not found." },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "No product" });
     }
 
-    const stripe = new Stripe(stripeSecretKey);
+    const origin = process.env.NEXT_PUBLIC_SITE_URL!;
+
+    const freeShipping = product.price >= 2000;
 
     const session = await stripe.checkout.sessions.create({
-      mode: "payment",
       payment_method_types: ["card"],
+      mode: "payment",
+
+      shipping_address_collection: {
+        allowed_countries: ["IT", "FR", "DE", "ES", "GB", "US"]
+      },
+
       line_items: [
         {
           quantity: 1,
           price_data: {
-            currency: product.currency,
+            currency: "eur",
+            unit_amount: product.price,
+            product_data: {
+              name: product.name,
+              description: product.description,
+              images: [product.images[0]]
+            }
+          }
+        },
+
+        ...(freeShipping
+          ? []
+          : [
+              {
+                quantity: 1,
+                price_data: {
+                  currency: "eur",
+                  unit_amount: 499,
+                  product_data: {
+                    name: "Shipping"
+                  }
+                }
+              }
+            ])
+      ],
+
+      success_url: `${origin}/success`,
+      cancel_url: `${origin}/cancel`
+    });
+
+    return NextResponse.redirect(session.url!, 303);
+  } catch (err) {
+    console.log(err);
+
+    return NextResponse.json({
+      error: "Stripe checkout failed"
+    });
+  }
+}            currency: product.currency,
             unit_amount: product.price,
             product_data: {
               name: product.name,
