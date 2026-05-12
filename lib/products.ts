@@ -22,8 +22,8 @@ export const products: Product[] = [
     images: [
       "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
       "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-      "https://images.unsplash.com/photo-1491553895911-0055eca6402d"
-    ]
+      "https://images.unsplash.com/photo-1491553895911-0055eca6402d",
+    ],
   },
   {
     id: "pulse-lamp",
@@ -37,8 +37,8 @@ export const products: Product[] = [
     images: [
       "https://images.unsplash.com/photo-1519710164239-da123dc03ef4",
       "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85",
-      "https://images.unsplash.com/photo-1484704849700-f032a568e944"
-    ]
+      "https://images.unsplash.com/photo-1484704849700-f032a568e944",
+    ],
   },
   {
     id: "aero-bottle",
@@ -52,21 +52,12 @@ export const products: Product[] = [
     images: [
       "https://images.unsplash.com/photo-1602143407151-7111542de6e8",
       "https://images.unsplash.com/photo-1523362628745-0c100150b504",
-      "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd"
-    ]
-  }
+      "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd",
+    ],
+  },
 ];
 
 export function getProduct(id: string) {
-  return products.find((product) => product.id === id);
-}
-
-export function formatPrice(cents: number) {
-  return new Intl.NumberFormat("en-IE", {
-    style: "currency",
-    currency: "EUR"
-  }).format(cents / 100);
-}export function getProduct(id: string) {
   return products.find((product) => product.id === id);
 }
 
