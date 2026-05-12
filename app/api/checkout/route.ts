@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+
 import { getProduct } from "@/lib/products";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -13,7 +14,10 @@ export async function POST(request: Request) {
     const product = getProduct(productId);
 
     if (!product) {
-      return NextResponse.json({ error: "No product" });
+      return NextResponse.json(
+        { error: "No product found" },
+        { status: 404 }
+      );
     }
 
     const origin = process.env.NEXT_PUBLIC_SITE_URL!;
@@ -25,21 +29,36 @@ export async function POST(request: Request) {
       mode: "payment",
 
       shipping_address_collection: {
-        allowed_countries: ["IT", "FR", "DE", "ES", "GB", "US"]
+        allowed_countries: [
+          "IT",
+          "FR",
+          "DE",
+          "ES",
+          "NL",
+          "BE",
+          "IE",
+          "PT",
+          "AT",
+          "GB",
+          "US",
+        ],
       },
 
       line_items: [
         {
           quantity: 1,
+
           price_data: {
             currency: "eur",
+
             unit_amount: product.price,
+
             product_data: {
               name: product.name,
               description: product.description,
-              images: [product.images[0]]
-            }
-          }
+              images: [product.images[0]],
+            },
+          },
         },
 
         ...(freeShipping
@@ -47,48 +66,28 @@ export async function POST(request: Request) {
           : [
               {
                 quantity: 1,
+
                 price_data: {
                   currency: "eur",
+
                   unit_amount: 499,
+
                   product_data: {
-                    name: "Shipping"
-                  }
-                }
-              }
-            ])
+                    name: "Shipping",
+                  },
+                },
+              },
+            ]),
       ],
 
-      success_url: `${origin}/success`,
-      cancel_url: `${origin}/cancel`
-    });
+      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
 
-    return NextResponse.redirect(session.url!, 303);
-  } catch (err) {
-    console.log(err);
-
-    return NextResponse.json({
-      error: "Stripe checkout failed"
-    });
-  }
-}            currency: product.currency,
-            unit_amount: product.price,
-            product_data: {
-              name: product.name,
-              description: product.description,
-            },
-          },
-        },
-      ],
-      success_url: `${siteUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${siteUrl}/cancel`,
-      shipping_address_collection: {
-        allowed_countries: ["IT", "FR", "DE", "ES", "NL", "BE", "IE", "PT", "AT"],
-      },
+      cancel_url: `${origin}/cancel`,
     });
 
     if (!session.url) {
       return NextResponse.json(
-        { error: "Stripe did not return a checkout URL." },
+        { error: "Stripe did not return a checkout URL" },
         { status: 500 }
       );
     }
@@ -96,8 +95,9 @@ export async function POST(request: Request) {
     return NextResponse.redirect(session.url, 303);
   } catch (error) {
     console.error("Checkout error:", error);
+
     return NextResponse.json(
-      { error: "Checkout failed." },
+      { error: "Checkout failed" },
       { status: 500 }
     );
   }
